@@ -12,6 +12,7 @@ import android.widget.ListView;
 public class engineer extends AppCompatActivity {
     ListView L1;
     ArrayAdapter<String> adapter;
+    String username= "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,6 +22,8 @@ public class engineer extends AppCompatActivity {
         L1 = (ListView) findViewById(R.id.listview);
         adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1);
         L1.setAdapter(adapter);
+        Intent intent = getIntent();
+        username = intent.getStringExtra("index");
 
         adapter.add("컴퓨터공학");
         adapter.add("전자공학(추가예정)");
@@ -30,6 +33,7 @@ public class engineer extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(position == 0){
                     Intent intent = new Intent(engineer.this,Computer.class);
+                    intent.putExtra("index",username);
                     startActivity(intent);
 
                 }

@@ -1,6 +1,8 @@
 package comwow2778.naver.blog.everyonestudy;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -21,6 +23,9 @@ public class userspace extends AppCompatActivity {
     String username = "";
     String seconds = "";
     String path = "";
+    SQLiteDatabase db;
+    DBHelper dbHelper;
+    String sql;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,8 +38,14 @@ public class userspace extends AppCompatActivity {
         time = (TextView)findViewById(R.id.texttime);
         memo = (EditText)findViewById(R.id.etmemo);
         path = getFilesDir().getPath() + "memo/" + "memo.txt";
-        name.setText(username);
-        time.setText(seconds); // db에서가져오기
+        name.setText("유저 이름"+username);
+        dbHelper = new DBHelper(this,"esdb",null,1);
+        db = dbHelper.getReadableDatabase();
+        sql = "Select * from user where name='"+username+"';";
+        Cursor user = db.rawQuery(sql,null);
+        user.moveToNext();
+        seconds = user.getString(1);
+        time.setText("학습 시간" +seconds +"초"); // db에서가져오기
         readFile(path);
     }
 

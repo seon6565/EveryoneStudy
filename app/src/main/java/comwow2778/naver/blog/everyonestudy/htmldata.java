@@ -2,6 +2,8 @@ package comwow2778.naver.blog.everyonestudy;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -42,6 +44,10 @@ public class htmldata extends AppCompatActivity {
     myTask task;
     LinearLayout memo;
     int time = 0;
+    String username = "";
+    SQLiteDatabase db;
+    DBHelper dbHelper;
+    int prevtime = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +58,16 @@ public class htmldata extends AppCompatActivity {
         et1 = (EditText)findViewById(R.id.memoet);
         Intent intent = getIntent();
         index = intent.getIntExtra("index",0);
+        username = intent.getStringExtra("name");
+
+        dbHelper = new DBHelper(this,"esdb",null,1);
+        db = dbHelper.getWritableDatabase();
+        db = dbHelper.getReadableDatabase();
+        String sql = "Select * from user where name='"+username+"';";
+        Cursor user = db.rawQuery(sql,null);
+        user.moveToNext();
+        prevtime = Integer.valueOf(user.getString(1));
+
         WebSettings set = webView.getSettings();
         dialog = new ProgressDialog(this);
         task = new myTask();
@@ -77,30 +93,39 @@ public class htmldata extends AppCompatActivity {
         set.setJavaScriptEnabled(true);
         if(index == 0) {
             webView.loadUrl("https://ko.khanacademy.org/computing/computer-programming/html-css/intro-to-html/v/making-webpages-intro");
+            db.execSQL("Update html set chapter1='1'where name='"+username+"';");
         }
         else if(index == 1) {
             webView.loadUrl("https://ko.khanacademy.org/computing/computer-programming/html-css/intro-to-css/p/css-basics");
+            db.execSQL("Update html set chapter2='1'where name='"+username+"';");
         }
         else if(index == 2) {
             webView.loadUrl("https://ko.khanacademy.org/computing/computer-programming/html-css/html-tags-continued/p/html-links");
+            db.execSQL("Update html set chapter3='1'where name='"+username+"';");
         }
         else if(index == 3) {
             webView.loadUrl("https://ko.khanacademy.org/computing/computer-programming/html-css/css-text-properties/v/css-zen-garden");
+            db.execSQL("Update html set chapter4='1'where name='"+username+"';");
         }
         else if(index == 4) {
             webView.loadUrl("https://ko.khanacademy.org/computing/computer-programming/html-css/web-development-tools/a/developing-webpages-outside-of-khan-academy");
+            db.execSQL("Update html set chapter5='1'where name='"+username+"';");
         }
         else if(index == 5) {
             webView.loadUrl("https://ko.khanacademy.org/computing/computer-programming/html-css/css-layout-properties/p/css-grouping-elements");
+            db.execSQL("Update html set chapter6='1'where name='"+username+"';");
         }
         else if(index == 6) {
             webView.loadUrl("https://ko.khanacademy.org/computing/computer-programming/html-css/more-css-selectors/p/using-multiple-css-classes");
+            db.execSQL("Update html set chapter7='1'where name='"+username+"';");
         }
         else if(index == 7) {
             webView.loadUrl("https://ko.khanacademy.org/computing/computer-programming/html-css/more-ways-to-embed-css/p/using-inline-css-styles");
+            db.execSQL("Update html set chapter8='1'where name='"+username+"';");
         }
         else if(index == 8) {
             webView.loadUrl("https://ko.khanacademy.org/computing/computer-programming/html-css/html-css-further-learning/a/webpage-design");
+            db.execSQL("Update html set chapter9='1'where name='"+username+"';");
         }
         webView.setWebViewClient(new WebViewClient(){
             @Override
@@ -164,10 +189,12 @@ public class htmldata extends AppCompatActivity {
     public void onClick(View v){
         if(v.getId()==R.id.studybt){
             task.cancel(true);
-            timereadFile(getFilesDir().getPath() + "time/" + "time.txt"); // 학습시간 불러오기 _> SQL로 수정
-            writetimeFile(getFilesDir().getPath() + "time/" + "time.txt");   // 학습시간 추가해서 저장 ->SQL로 수정
+            int totaltime = seconds+prevtime;
+            String time = Integer.toString(totaltime);
+            db.execSQL("Update user set time='"+time+"'where name='"+username+"';");
             Toast.makeText(this, "학습시간 저장완료", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(htmldata.this,html.class);
+            intent.putExtra("index",username);
             startActivity(intent);
             finish();
         }
